@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { HomeHeader } from "@/components/HomeHeader";
+// import { HomeHeader } from "@/components/HomeHeader";
 import VisitorTracker from "@/components/VisitorTracker";
+import SiteLayout from "@/components/SiteLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,6 +23,9 @@ export const metadata: Metadata = {
   },
   description:
     "Discover premium stays in India, from heritage hotels to beach resorts, villas and luxury city escapes.",
+  verification: {
+    google: "ss3f6EpkwFrmb2xUjPnwyWDAC0_gk7aZYucrv4fDzBk",
+  },
   keywords: [
     "hotels in India",
     "premium stays",
@@ -48,9 +52,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body suppressHydrationWarning className="min-h-full bg-[#ffffff] text-[#111111]">
-        <VisitorTracker />
+        {/* <VisitorTracker />
         <HomeHeader />
-        {children}
+        {children} */}
+        <VisitorTracker />
+<SiteLayout>{children}</SiteLayout>
       </body>
     </html>
   );
