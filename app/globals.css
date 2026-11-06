@@ -2,7 +2,12 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
+  --card: #ffffff;
+  --muted: #666666;
+  --accent: #000000;
+  --accent-soft: #f7f7f7;
+  --shadow: rgba(0, 0, 0, 0.08);
 }
 
 @theme inline {
@@ -12,15 +17,114 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
+  min-height: 100vh;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+p {
+  margin: 0;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.editorial-shell {
+  width: min(1280px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.serif-display {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+@keyframes hero-copy-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes experience-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-33.333333%, 0, 0);
+  }
+}
+
+.experience-marquee-track {
+  animation: experience-marquee 60s linear infinite;
+  will-change: transform;
+  touch-action: pan-y;
+}
+
+.experience-marquee-track.animation-paused {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .experience-marquee-track {
+    animation: none;
+  }
+}
+
+.hotel-map-shell .leaflet-container {
+  min-height: 100%;
+  background: #f7f7f7;
+  font-family: inherit;
+}
+
+.hotel-map-shell .leaflet-control-zoom a {
+  color: #111111;
+}
+
+.hotel-price-marker {
+  width: max-content !important;
+  height: auto !important;
+  padding: 5px 8px;
+  border: 1px solid #dddddd;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
+  color: #111111;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.hotel-price-marker.is-active {
+  border-color: #111111;
+  background: #111111;
+  color: #ffffff;
+  transform: translateY(-2px) scale(1.06);
 }

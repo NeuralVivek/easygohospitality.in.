@@ -1,0 +1,20 @@
+.shell {
+  --font-dm-sans: Arial, Helvetica, sans-serif;
+  --font-italiana: Georgia, "Times New Roman", serif;
+  isolation: isolate;
+  min-height: 100vh;
+  background: #f6f3ec;
+  color: #17352a;
+  font-family: var(--font-dm-sans);
+}
+
+.shell *,
+.shell *::before,
+.shell *::after {
+  box-sizing: border-box;
+}
+
+.shell a,
+.shell button {
+  cursor: pointer;
+}
