@@ -3,13 +3,14 @@ import type { MetadataRoute } from "next";
 import { getDestinationList, hotels } from "@/lib/hotels";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://www.easygohospitality.in";
+  const baseUrl = "https://easygohospitality.in";
   const destinations = getDestinationList();
 
   const routes = [
     "",
     "/hotels",
     "/hotels-in",
+    "/click-tiger-den",
     "/destinations/jaipur",
     "/destinations/goa",
     "/destinations/delhi",
@@ -30,4 +31,3 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === "" ? 1 : 0.8,
   }));
 }
-

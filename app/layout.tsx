@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.easygohospitality.in"),
+  metadataBase: new URL("https://easygohospitality.in"),
   title: {
     default: "easygohospitality.in | Premium India Hotel Discovery",
     template: "%s | easygohospitality.in",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "easygohospitality.in",
     description: "Luxury and premium hotel discovery across India.",
-    url: "https://www.easygohospitality.in",
+    url: "https://easygohospitality.in",
     siteName: "easygohospitality.in",
     type: "website",
     locale: "en_IN",

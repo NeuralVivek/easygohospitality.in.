@@ -6,8 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://www.easygohospitality.in/sitemap.xml",
-    host: "https://www.easygohospitality.in",
+    sitemap: "https://easygohospitality.in/sitemap.xml",
+    host: "https://easygohospitality.in",
   };
 }
-

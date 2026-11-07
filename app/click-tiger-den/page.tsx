@@ -1,6 +1,9 @@
 'use client'
 
+import Image from 'next/image'
+import Link from 'next/link'
 import { FormEvent, useEffect, useRef, useState } from 'react'
+import { trackEvent } from '@/components/VisitorTracker'
 
 const images = {
   hero: 'https://images.unsplash.com/photo-1571755118908-0ded70b1c473?auto=format&fit=crop&w=1800&q=88',
@@ -169,6 +172,98 @@ const features = [
   { icon: 'shield' as IconName, title: 'Best price assurance', text: 'Enquire directly for our most suitable available offer.' },
 ]
 
+const offers = [
+  {
+    title: 'Destination Wedding Packages',
+    description: 'Plan a destination wedding in Jim Corbett with event support, guest room planning, custom menus and coordinated décor.',
+    includes: 'Guest room planning · Décor and setup coordination · Custom menus · Event assistance',
+    occasion: 'Destination wedding',
+  },
+  {
+    title: 'Wedding Celebration Packages',
+    description: 'Bring Haldi, Mehendi, Sangeet, pheras and wedding receptions together as a multi-day celebration close to nature.',
+    includes: 'Indoor or outdoor functions · Pre-wedding events · Meal moments · Farewell events',
+    occasion: 'Wedding celebration',
+  },
+  {
+    title: 'Corporate Event Packages',
+    description: 'Host corporate events, business meetings, conferences and team offsites with flexible layouts and group stay coordination.',
+    includes: 'Meeting layouts · Working meals and refreshments · Group stay coordination · Event support',
+    occasion: 'Business meet / offsite',
+  },
+  {
+    title: 'Family Stay Packages',
+    description: 'Create a family resort stay in Jim Corbett with comfortable rooms, shared time and a nature-led break between adventures.',
+    includes: 'Family room options · Flexible bedding · Resort leisure time · Direct assistance',
+    occasion: 'Holiday stay',
+  },
+  {
+    title: 'Luxury Tent Stay Packages',
+    description: 'Request a luxury tent stay in Jim Corbett for a glamping-style escape with a double bed, private bathroom and air-conditioned comfort.',
+    includes: 'Comfortable double bed · Private bathroom · Tea and coffee setup · Outdoor atmosphere',
+    occasion: 'Luxury tent stay',
+  },
+  {
+    title: 'Weekend Getaway Packages',
+    description: 'Plan a weekend getaway in Jim Corbett from Delhi with a personalised resort booking quote based on your dates and stay preference.',
+    includes: 'Room or tent options · Date-based availability · Direct resort assistance · Custom quotation',
+    occasion: 'Weekend getaway',
+  },
+]
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'LodgingBusiness',
+      '@id': 'https://easygohospitality.in/click-tiger-den#lodging',
+      name: 'Click Resort Corbett Tiger Den',
+      description: 'Destination wedding resort, wedding accommodation and corporate event stays in Jim Corbett.',
+      url: 'https://easygohospitality.in/click-tiger-den',
+      telephone: '+918595661099',
+      image: images.hero,
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Jim Corbett',
+        addressRegion: 'Uttarakhand',
+        addressCountry: 'IN',
+      },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://easygohospitality.in' },
+        { '@type': 'ListItem', position: 2, name: 'Click Resort Corbett Tiger Den', item: 'https://easygohospitality.in/click-tiger-den' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Can you plan weddings and multi-day functions?',
+          acceptedAnswer: { '@type': 'Answer', text: 'Yes. Share your dates, estimated guest count and function plan, and the team can suggest a suitable stay-and-event arrangement.' },
+        },
+        {
+          '@type': 'Question',
+          name: 'Do you host corporate offsites and meetings?',
+          acceptedAnswer: { '@type': 'Answer', text: 'Yes. The resort can accommodate team gatherings, discussions, meals and leisure time within one destination.' },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can I request a customised package?',
+          acceptedAnswer: { '@type': 'Answer', text: 'Absolutely. Direct enquiries can be shaped around rooms, meals, event requirements and your preferred experience.' },
+        },
+        {
+          '@type': 'Question',
+          name: 'How do I get the best available price?',
+          acceptedAnswer: { '@type': 'Answer', text: 'Use the enquiry form with your preferred dates, or call the reservation team for the most suitable direct offer available.' },
+        },
+      ],
+    },
+  ],
+}
+
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -176,6 +271,7 @@ export default function App() {
   const [slideIndex, setSlideIndex] = useState(0)
   const [selectedRoom, setSelectedRoom] = useState<number | null>(null)
   const [roomSlideIndex, setRoomSlideIndex] = useState(0)
+  const [selectedOccasion, setSelectedOccasion] = useState('Destination wedding')
   const showcaseRef = useRef<HTMLDivElement>(null)
   const roomShowcaseRef = useRef<HTMLDivElement>(null)
   const activeEvent = selectedEvent === null ? null : events[selectedEvent]
@@ -225,6 +321,8 @@ function submitEnquiry(event: FormEvent<HTMLFormElement>) {
   const occasion = String(formData.get('occasion') || '')
   const date = String(formData.get('date') || '')
   const guests = String(formData.get('guests') || '')
+  const rooms = String(formData.get('rooms') || '')
+  const budget = String(formData.get('budget') || '')
   const message = String(formData.get('message') || '')
 
   const whatsappMessage = `
@@ -239,6 +337,8 @@ Email: ${email}
 Planning: ${occasion}
 Preferred Date: ${date || 'Not specified'}
 Expected Guests: ${guests || 'Not specified'}
+Rooms Required: ${rooms || 'Not specified'}
+Budget Range: ${budget || 'Not specified'}
 
 Additional Details:
 ${message || 'No additional details'}
@@ -250,6 +350,12 @@ Thank you!
 
   const whatsappURL = `https://wa.me/918595661099?text=${encodeURIComponent(whatsappMessage)}`
 
+  trackEvent('enquiry_submitted', { occasion: occasion || 'resort booking' })
+  trackEvent('whatsapp_click', { occasion: occasion || 'resort booking' })
+  const occasionEvent = occasion.toLowerCase()
+  if (occasionEvent.includes('wedding')) trackEvent('wedding_package_enquiry')
+  if (occasionEvent.includes('business')) trackEvent('corporate_event_enquiry')
+  if (occasionEvent.includes('tent')) trackEvent('tent_stay_enquiry')
   window.location.href = whatsappURL
 }
 
@@ -272,12 +378,19 @@ Thank you!
 
   return (
     <main className="overflow-hidden bg-[#f6f3ec] text-[#17352a]">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+      <nav aria-label="Breadcrumb" className="sr-only">
+        <ol>
+          <li><Link href="/">Home</Link></li>
+          <li aria-current="page">Click Resort Corbett Tiger Den</li>
+        </ol>
+      </nav>
       <header className="absolute inset-x-0 top-0 z-30 text-white">
         <div className="border-b border-white/20">
           <div className="mx-auto flex max-w-[1380px] items-center justify-between px-5 py-3 text-[11px] font-medium tracking-[.14em] uppercase sm:px-8">
             <p className="flex items-center gap-2"><Icon name="map" className="h-4 w-4 text-[#f3bd65]" /> Jim Corbett, Uttarakhand</p>
             <div className="hidden items-center gap-7 md:flex">
-              <a className="transition hover:text-[#f3bd65]" href="tel:+919999999999"><Icon name="phone" className="mr-2 inline h-3.5 w-3.5" /> Call for reservations</a>
+              <a className="transition hover:text-[#f3bd65]" href="tel:+918595661099" onClick={() => trackEvent('phone_click', { location: 'header' })}><Icon name="phone" className="mr-2 inline h-3.5 w-3.5" /> Call for reservations</a>
               <a className="transition hover:text-[#f3bd65]" href="#enquire">Plan an event</a>
             </div>
           </div>
@@ -291,22 +404,23 @@ Thank you!
             </span>
           </a>
           <div className="hidden items-center gap-8 text-xs font-semibold tracking-[.13em] uppercase lg:flex">
-            <a className="nav-link" href="#offers">Offers</a>
-            <a className="nav-link" href="#rooms">Rooms</a>
-            <a className="nav-link" href="#events">Weddings & Events</a>
-            <a className="nav-link" href="#experiences">Experiences</a>
-            <a className="nav-link" href="#about">About</a>
-            <a href="#enquire" className="border border-white/60 px-5 py-3.5 transition hover:border-[#f3bd65] hover:bg-[#f3bd65] hover:text-[#17352a]">Check best price</a>
+            <a className="nav-link" href="#wedding-packages">Wedding Packages</a>
+            <a className="nav-link" href="#wedding-venues">Wedding Spaces</a>
+            <a className="nav-link" href="#rooms">Accommodation</a>
+            <a className="nav-link" href="#wedding-process">Planning Process</a>
+            <a className="nav-link" href="#enquire">Enquire</a>
+            <a href="#enquire" className="border border-white/60 px-5 py-3.5 transition hover:border-[#f3bd65] hover:bg-[#f3bd65] hover:text-[#17352a]">Plan your wedding</a>
           </div>
           <button className="relative z-40 grid h-11 w-11 place-items-center border border-white/40 lg:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu"><Icon name="menu" /></button>
         </nav>
         {menuOpen && (
           <div className="absolute inset-x-0 top-0 bg-[#17352a] px-6 pb-10 pt-28 shadow-2xl lg:hidden">
             <div className="flex flex-col gap-6 font-serif text-2xl">
-              <a href="#offers" onClick={() => setMenuOpen(false)}>Offers</a>
+              <a href="#wedding-packages" onClick={() => setMenuOpen(false)}>Wedding packages</a>
+              <a href="#wedding-venues" onClick={() => setMenuOpen(false)}>Wedding spaces</a>
               <a href="#rooms" onClick={() => setMenuOpen(false)}>Rooms</a>
-              <a href="#events" onClick={() => setMenuOpen(false)}>Weddings & Events</a>
-              <a href="#experiences" onClick={() => setMenuOpen(false)}>Experiences</a>
+              <a href="#wedding-process" onClick={() => setMenuOpen(false)}>Planning process</a>
+              <a href="#events" onClick={() => setMenuOpen(false)}>Corporate events</a>
               <a href="#about" onClick={() => setMenuOpen(false)}>About the resort</a>
             </div>
           </div>
@@ -314,24 +428,24 @@ Thank you!
       </header>
 
       <section className="relative flex min-h-[790px] items-end bg-[#17352a] pb-28 pt-44 text-white lg:min-h-[860px] lg:items-center lg:pb-24">
-        <img src={images.hero} alt="Serene resort pool surrounded by lush green trees" className="absolute inset-0 h-full w-full object-cover" />
+        <Image src={images.hero} alt="Resort pool surrounded by lush green trees at Click Resort Corbett Tiger Den" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,35,26,.91)_0%,rgba(10,35,26,.65)_48%,rgba(10,35,26,.12)_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(8,29,22,.62)_0%,transparent_48%)]" />
         <div className="relative mx-auto w-full max-w-[1380px] px-5 sm:px-8">
           <div className="max-w-3xl">
-            <p className="mb-5 flex items-center gap-3 text-[11px] font-bold tracking-[.3em] text-[#f3bd65] uppercase before:h-px before:w-10 before:bg-[#f3bd65]">A soulful stay in Corbett</p>
+            <p className="mb-5 flex items-center gap-3 text-[11px] font-bold tracking-[.3em] text-[#f3bd65] uppercase before:h-px before:w-10 before:bg-[#f3bd65]">A wedding destination in Corbett</p>
             <h1 className="max-w-3xl font-serif text-[52px] leading-[.98] tracking-[-.03em] sm:text-7xl lg:text-[92px]">
-              Where every escape becomes a <em className="font-normal text-[#f3bd65]">story.</em>
+              Destination Wedding Resort in <em className="font-normal text-[#f3bd65]">Jim Corbett.</em>
             </h1>
-            <p className="mt-7 max-w-xl text-base leading-7 text-white/78 sm:text-lg">Wake up to birdsong, celebrate under open skies, and make room for moments that stay with you long after you leave.</p>
+            <p className="mt-7 max-w-xl text-base leading-7 text-white/78 sm:text-lg">Bring your Haldi, Mehendi, Sangeet, ceremony and reception together in one nature-led destination, with wedding accommodation and a personalised plan for your guests.</p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <a href="#enquire" className="btn-gold">Get our best price <Icon name="arrow" /></a>
-              <a href="#events" className="btn-ghost">Explore celebrations</a>
+              <a href="#enquire" className="btn-gold" onClick={() => trackEvent('wedding_cta_click', { location: 'hero' })}>Plan your wedding <Icon name="arrow" /></a>
+              <a href="#wedding-venues" className="btn-ghost">Explore wedding spaces</a>
             </div>
             <div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-3 text-xs text-white/70">
               <span className="flex items-center gap-2"><Icon name="check" className="h-4 w-4 text-[#f3bd65]" /> No booking fee</span>
               <span className="flex items-center gap-2"><Icon name="check" className="h-4 w-4 text-[#f3bd65]" /> Direct resort assistance</span>
-              <span className="flex items-center gap-2"><Icon name="check" className="h-4 w-4 text-[#f3bd65]" /> Custom event quote</span>
+              <span className="flex items-center gap-2"><Icon name="check" className="h-4 w-4 text-[#f3bd65]" /> Custom wedding quote</span>
             </div>
           </div>
         </div>
@@ -344,9 +458,10 @@ Thank you!
         </div>
         <div className="absolute bottom-0 left-1/2 hidden w-[calc(100%-64px)] max-w-[1240px] -translate-x-1/2 translate-y-1/2 bg-white text-[#17352a] shadow-[0_24px_80px_rgba(12,34,26,.2)] lg:block">
           <form className="grid grid-cols-[1fr_1fr_1.1fr_.9fr] items-stretch" onSubmit={submitEnquiry}>
-            <label className="booking-field"><span><Icon name="calendar" /> Check in</span><input type="date" aria-label="Check in date" /></label>
-            <label className="booking-field"><span><Icon name="calendar" /> Check out</span><input type="date" aria-label="Check out date" /></label>
-            <label className="booking-field"><span><Icon name="guests" /> Guests & rooms</span><select aria-label="Guests and rooms"><option>2 Guests, 1 Room</option><option>4 Guests, 2 Rooms</option><option>Group stay</option></select></label>
+            <input type="hidden" name="occasion" value="Destination wedding" />
+            <label className="booking-field"><span><Icon name="calendar" /> Check in</span><input name="date" type="date" aria-label="Check in date" /></label>
+            <label className="booking-field"><span><Icon name="calendar" /> Check out</span><input name="checkOut" type="date" aria-label="Check out date" /></label>
+            <label className="booking-field"><span><Icon name="guests" /> Guests & rooms</span><select name="guests" aria-label="Guests and rooms"><option>2 Guests, 1 Room</option><option>4 Guests, 2 Rooms</option><option>Group stay</option></select></label>
             <button className="m-3 bg-[#c98736] px-7 text-sm font-bold tracking-[.12em] text-white uppercase transition hover:bg-[#a96c27]">{submitted ? 'Request received' : 'Check best price'}</button>
           </form>
         </div>
@@ -374,17 +489,104 @@ Thank you!
         </div>
       </section>
 
+      <section id="wedding-venues" className="bg-[#17352a] px-5 py-20 text-white sm:px-8 lg:py-28">
+        <div className="mx-auto max-w-[1240px]">
+          <div className="max-w-3xl">
+            <p className="eyebrow !text-[#f3bd65]">Your wedding, in the wild</p>
+            <h2 className="section-title !text-white">Why choose Jim Corbett for your <em>destination wedding?</em></h2>
+            <p className="mt-6 text-base leading-8 text-white/68">Jim Corbett gives couples a wedding setting that feels distinct from the city: a nature-led backdrop, time together across several functions and a resort stay for the people who matter most. At Click Resort Corbett Tiger Den, the wedding plan starts with your dates, guest list and celebration style.</p>
+            <Link href="/hotels?destination=jim%20corbett" className="mt-6 inline-flex items-center gap-2 text-xs font-bold tracking-[.14em] text-[#f3bd65] uppercase">Explore Jim Corbett stays <Icon name="arrow" className="h-4 w-4" /></Link>
+          </div>
+
+          <div className="mt-14 grid gap-px bg-white/15 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['A complete wedding weekend', 'Plan ceremonies, celebrations, meals and guest stays around one destination.'],
+              ['A nature-led setting', 'Give your wedding photographs and gatherings the atmosphere of Corbett.'],
+              ['Accommodation for guests', 'Explore the Luxury Tent, Deluxe Room and Family Cottage options in the room gallery.'],
+              ['One clear point of contact', 'Share the full brief and receive a proposal shaped around your dates and requirements.'],
+            ].map(([title, text]) => (
+              <article key={title} className="bg-[#17352a] p-7">
+                <Icon name="sparkle" className="mb-5 h-6 w-6 text-[#f3bd65]" />
+                <h3 className="font-serif text-xl">{title}</h3>
+                <p className="mt-3 text-sm leading-6 text-white/58">{text}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="mt-16 grid gap-10 lg:grid-cols-[1.05fr_.95fr] lg:items-center">
+            <div className="relative min-h-[420px] overflow-hidden">
+              <Image src={images.wedding} alt="Destination wedding celebration in Jim Corbett" fill sizes="(max-width: 1024px) 100vw, 55vw" className="object-cover" />
+            </div>
+            <div>
+              <p className="eyebrow !text-[#f3bd65]">Destination weddings at Click Resort Corbett Tiger Den</p>
+              <h2 className="mt-3 font-serif text-4xl sm:text-5xl">A wedding resort near Ramnagar for every meaningful moment.</h2>
+              <p className="mt-5 text-sm leading-7 text-white/65">Use the resort as the base for a multi-day celebration: welcome moments, Haldi and Mehendi, Sangeet, wedding ceremony, reception and farewell. The team can discuss event flow, room planning, meals and décor coordination before confirming what is available for your dates.</p>
+              <a href="#rooms" className="mt-6 inline-flex items-center gap-2 text-xs font-bold tracking-[.14em] text-[#f3bd65] uppercase">Explore wedding accommodation <Icon name="arrow" className="h-4 w-4" /></a>
+              <a href="#enquire" className="btn-gold mt-8" onClick={() => trackEvent('wedding_cta_click', { location: 'wedding_overview' })}>Request a wedding proposal <Icon name="arrow" /></a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="wedding-gallery" className="px-5 py-20 sm:px-8 lg:py-28">
+        <div className="mx-auto max-w-[1240px]">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div>
+              <p className="eyebrow">Wedding gallery</p>
+              <h2 className="section-title">From Haldi and Mehendi<br /><em>to Sangeet and receptions.</em></h2>
+            </div>
+            <p className="max-w-md text-sm leading-7 text-[#61736b]">Shape each function around the mood you want. Final spaces, layouts, décor, menus and availability are confirmed in your personalised wedding proposal.</p>
+          </div>
+          <div className="mt-14 grid gap-4 md:grid-cols-2">
+            <article className="relative min-h-[440px] overflow-hidden bg-[#17352a] text-white">
+              <Image src={images.venue} alt="Outdoor wedding ceremony arrangement in Jim Corbett" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#091d17]/90 via-transparent to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-7 sm:p-9">
+                <h3 className="font-serif text-3xl">Haldi and Mehendi celebrations</h3>
+                <p className="mt-3 max-w-lg text-sm leading-6 text-white/72">Plan colourful pre-wedding functions with a flow that keeps family, friends, food and photographs at the heart of the day.</p>
+              </div>
+            </article>
+            <article className="relative min-h-[440px] overflow-hidden bg-[#17352a] text-white">
+              <Image src={images.party} alt="Sangeet and wedding reception celebration" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#091d17]/90 via-transparent to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-7 sm:p-9">
+                <h3 className="font-serif text-3xl">Sangeet and wedding receptions</h3>
+                <p className="mt-3 max-w-lg text-sm leading-6 text-white/72">Discuss evening celebrations, reception layouts, dining moments and the details that make the final event feel like yours.</p>
+              </div>
+            </article>
+          </div>
+          <div className="mt-12 grid gap-10 lg:grid-cols-3">
+            <article>
+              <p className="eyebrow">Wedding ceremony arrangements</p>
+              <h3 className="mt-3 font-serif text-2xl">A considered ceremony flow</h3>
+              <p className="mt-3 text-sm leading-7 text-[#61736b]">Share your preferred ceremony style, timing and guest movement. The team will confirm suitable indoor or outdoor arrangements and what can be coordinated for your date.</p>
+            </article>
+            <article>
+              <p className="eyebrow">Wedding venue and event spaces</p>
+              <h3 className="mt-3 font-serif text-2xl">Spaces to discuss with the team</h3>
+              <p className="mt-3 text-sm leading-7 text-[#61736b]">The property presents indoor and outdoor function possibilities. Layouts, usable areas, weather plans and confirmed capacity require property-team verification before booking.</p>
+            </article>
+            <article>
+              <p className="eyebrow">Wedding dining and hospitality</p>
+              <h3 className="mt-3 font-serif text-2xl">Food, welcome and togetherness</h3>
+              <p className="mt-3 text-sm leading-7 text-[#61736b]">Discuss welcome moments, working menus, meal timings and guest preferences as part of the wedding brief. Specific catering menus and service details are confirmed in the quotation.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
       <section id="events" className="bg-[#17352a] px-5 py-20 text-white sm:px-8 lg:py-28">
         <div className="mx-auto max-w-[1380px]">
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <p className="eyebrow !text-[#f3bd65]">Gather. Celebrate. Connect.</p>
-              <h2 className="section-title max-w-3xl !text-white">Made for your<br /><em>milestone moments.</em></h2>
+              <p className="eyebrow !text-[#f3bd65]">Beyond the wedding weekend</p>
+              <h2 className="section-title max-w-3xl !text-white">Corporate events and<br /><em>private celebrations.</em></h2>
             </div>
-            <p className="max-w-sm text-sm leading-7 text-white/62">Share your occasion, guest count and preferred dates. Our event team will help turn your idea into a thoughtful plan.</p>
+            <p className="max-w-sm text-sm leading-7 text-white/62">Wedding planning remains our focus. For corporate offsites, business meetings, birthdays, reunions and private dinners, the same team can discuss a separate event brief.</p>
           </div>
           <div className="mt-14 grid gap-5 lg:grid-cols-3">
-            {events.map((item, index) => (
+            {events.map((item, index) => {
+              return (
               <button
                 type="button"
                 onClick={() => openEvent(index)}
@@ -393,7 +595,7 @@ Thank you!
                 aria-label={`View ${item.title} gallery and details`}
                 aria-pressed={selectedEvent === index}
               >
-                <img src={item.image} alt={item.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                <Image src={item.image} alt={`${item.title} at Click Resort Corbett Tiger Den`} fill sizes="(max-width: 1024px) 100vw, 33vw" className="object-cover transition duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(7,29,21,.92)_0%,rgba(7,29,21,.08)_70%)]" />
                 <div className="absolute inset-x-0 bottom-0 p-7 sm:p-9">
                   <p className="mb-3 text-[10px] font-bold tracking-[.25em] text-[#f3bd65] uppercase">{item.eyebrow}</p>
@@ -401,9 +603,14 @@ Thank you!
                   <p className="mt-3 max-w-sm text-sm leading-6 text-white/70">{item.text}</p>
                   <span className="mt-6 inline-flex items-center gap-2 border-b border-white/35 pb-1 text-xs font-bold tracking-[.13em] uppercase">{selectedEvent === index ? 'Viewing event details' : item.link} <Icon name="arrow" className={`h-4 w-4 transition-transform ${selectedEvent === index ? 'rotate-90' : 'group-hover:translate-x-1'}`} /></span>
                 </div>
+                <div className="mt-12 max-w-3xl border-l-2 border-[#c98736] pl-5 text-sm leading-7 text-white/70">
+                  <h3 className="font-serif text-2xl text-white">Destination weddings and corporate events in Jim Corbett</h3>
+                  <p className="mt-3">Use the resort as a base for Haldi and Mehendi celebrations, Sangeet evenings, wedding receptions, outdoor ceremonies, corporate meetings and group stays. Share your dates and guest count so the team can confirm suitable spaces, accommodation and catering options.</p>
+                </div>
                 <span className="absolute right-6 top-6 grid h-11 w-11 place-items-center border border-white/40 bg-[#17352a]/35 backdrop-blur-sm transition group-hover:bg-[#c98736]"><Icon name="arrow" className="h-4 w-4" /></span>
               </button>
-            ))}
+              )
+            })}
           </div>
 
           {activeEvent && (
@@ -413,10 +620,12 @@ Thank you!
               <div className="grid lg:grid-cols-[1.45fr_.85fr]">
                 <div className="relative min-h-[440px] overflow-hidden bg-[#132f25] sm:min-h-[560px] lg:min-h-[680px]">
                   {activeEvent.gallery.map((image, index) => (
-                    <img
+                    <Image
                       key={image}
                       src={image}
                       alt={`${activeEvent.title} inspiration ${index + 1}`}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 60vw"
                       className={`absolute inset-0 h-full w-full object-cover transition-all duration-500 ${index === slideIndex ? 'scale-100 opacity-100' : 'pointer-events-none scale-[1.02] opacity-0'}`}
                     />
                   ))}
@@ -463,10 +672,10 @@ Thank you!
       <section className="bg-[#17352a] px-5 pb-20 pt-5 text-white sm:px-8 lg:pb-32 lg:pt-20">
         <div className="mx-auto grid max-w-[1240px] gap-12 border-t border-white/12 pt-16 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
           <div className="relative grid grid-cols-[1.08fr_.92fr] gap-3">
-            <img src={images.venue} alt="Colourful outdoor celebration setup" className="h-[480px] w-full object-cover sm:h-[610px]" />
+            <Image src={images.venue} alt="Outdoor celebration setup for weddings in Jim Corbett" width={1200} height={900} className="h-[480px] w-full object-cover sm:h-[610px]" />
             <div className="grid gap-3 pt-14">
-              <img src={images.safari} alt="Mist over grassland in Corbett" className="h-[220px] w-full object-cover sm:h-[280px]" />
-              <img src={images.dining} alt="A generous spread of Indian dishes" className="h-[220px] w-full object-cover sm:h-[280px]" />
+              <Image src={images.safari} alt="Nature and wildlife landscape near Jim Corbett" width={800} height={600} className="h-[220px] w-full object-cover sm:h-[280px]" />
+              <Image src={images.dining} alt="Dining spread for resort guests in Jim Corbett" width={800} height={600} className="h-[220px] w-full object-cover sm:h-[280px]" />
             </div>
             <div className="absolute -bottom-5 left-6 border border-white/20 bg-[#c98736] px-6 py-5 shadow-xl sm:left-10">
               <p className="font-serif text-2xl">One destination.</p>
@@ -498,8 +707,8 @@ Thank you!
 
       <section id="stay" className="px-5 py-20 sm:px-8 lg:py-32">
         <div className="mx-auto grid max-w-[1240px] gap-12 lg:grid-cols-2 lg:items-center">
-          <div className="relative">
-            <img src={images.stay} alt="Resort pool with green hills in the background" className="h-[440px] w-full object-cover sm:h-[620px]" />
+          <div className="relative h-[440px] sm:h-[620px]">
+            <Image src={images.stay} alt="Resort stay with pool and green hills in Jim Corbett" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
             <div className="absolute -bottom-6 right-0 bg-[#c98736] px-7 py-6 text-white sm:-right-6">
               <p className="font-serif text-3xl">Stay. Celebrate.</p>
               <p className="mt-1 text-xs tracking-[.18em] text-white/75 uppercase">All in one beautiful place</p>
@@ -509,6 +718,7 @@ Thank you!
             <p className="eyebrow">Your Corbett getaway</p>
             <h2 className="section-title">Room to pause.<br /><em>Space to reconnect.</em></h2>
             <p className="mt-6 text-base leading-8 text-[#536a61]">Comfortable stays, warm hospitality and the outdoors close at hand. Whether it is a quick weekend, a family holiday or a full resort celebration, we help you settle in with ease.</p>
+            <p className="mt-4 text-sm leading-7 text-[#61736b]">The Luxury Tent is suited to guests looking for a luxury tent stay, Swiss tent accommodation or a jungle glamping experience. It includes a comfortable double bed, private bathroom, seating corner, air-conditioned comfort and tea and coffee setup. Request availability for a couple or family tent stay based on your dates.</p>
             <div className="mt-8 grid grid-cols-2 gap-4 text-sm">
               {[
                 ['pool', 'Swimming pool'],
@@ -528,10 +738,10 @@ Thank you!
         <div className="mx-auto max-w-[1380px]">
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <p className="eyebrow">Choose your stay</p>
-              <h2 className="section-title">Rooms with their own<br /><em>way of unwinding.</em></h2>
+              <p className="eyebrow">Wedding guest accommodation</p>
+              <h2 className="section-title">Rooms for your guests<br /><em>to pause and reconnect.</em></h2>
             </div>
-            <p className="max-w-sm text-sm leading-7 text-[#61736b]">Select any room type to explore its bedroom, bathroom, interior details and key comforts in the gallery below.</p>
+            <p className="max-w-sm text-sm leading-7 text-[#61736b]">Explore the Luxury Tent, Deluxe Room and Family Cottage options for wedding accommodation in Jim Corbett. Availability and rooming plans are confirmed for your dates.</p>
           </div>
 
           <div className="mt-14 grid gap-5 lg:grid-cols-3">
@@ -545,7 +755,7 @@ Thank you!
                 aria-pressed={selectedRoom === index}
               >
                 <div className="relative h-[360px] overflow-hidden">
-                  <img src={room.cover} alt={room.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                  <Image src={room.cover} alt={`${room.name} accommodation at Click Resort Corbett Tiger Den`} fill sizes="(max-width: 1024px) 100vw, 33vw" className="object-cover transition duration-700 group-hover:scale-105" />
                   <span className="absolute right-5 top-5 grid h-10 w-10 place-items-center bg-white/90 text-[#17352a] shadow-md transition group-hover:bg-[#c98736] group-hover:text-white"><Icon name="arrow" className="h-4 w-4" /></span>
                 </div>
                 <div className="p-7">
@@ -568,10 +778,12 @@ Thank you!
               <div className="grid lg:grid-cols-[1.45fr_.85fr]">
                 <div className="relative min-h-[440px] overflow-hidden bg-[#10271f] sm:min-h-[580px] lg:min-h-[690px]">
                   {activeRoom.gallery.map((photo, index) => (
-                    <img
+                    <Image
                       key={photo.src}
                       src={photo.src}
                       alt={`${activeRoom.name} — ${photo.label}`}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 60vw"
                       className={`absolute inset-0 h-full w-full object-cover transition-all duration-500 ${index === roomSlideIndex ? 'scale-100 opacity-100' : 'pointer-events-none scale-[1.02] opacity-0'}`}
                     />
                   ))}
@@ -616,17 +828,18 @@ Thank you!
         </div>
       </section>
 
-      <section id="experiences" className="bg-[#f6f3ec] px-5 py-20 sm:px-8 lg:py-28">
+      <section id="wedding-process" className="bg-[#f6f3ec] px-5 py-20 sm:px-8 lg:py-28">
+        <span id="experiences" className="sr-only" />
         <div className="mx-auto max-w-[1240px]">
           <div className="text-center">
-            <p className="eyebrow justify-center">Why book direct</p>
-            <h2 className="section-title">A simpler way to plan<br /><em>your perfect gathering.</em></h2>
+            <p className="eyebrow justify-center">Wedding planning process</p>
+            <h2 className="section-title">From first brief to<br /><em>your wedding weekend.</em></h2>
           </div>
           <div className="mt-14 grid gap-4 md:grid-cols-3">
             {[
-              ['01', 'Tell us your vision', 'Share the event, dates, guest count and the kind of experience you have in mind.'],
-              ['02', 'Receive a tailored plan', 'We align spaces, stay, meals and event requirements into one clear proposal.'],
-              ['03', 'Celebrate with ease', 'A dedicated point of contact helps keep your event smooth from arrival to farewell.'],
+              ['01', 'Share your wedding brief', 'Tell us your dates, guest count, functions, rooms required, budget range and the WhatsApp number for your planner.'],
+              ['02', 'Review the proposal', 'The team can align available spaces, accommodation, meals and event requirements into a clear wedding plan.'],
+              ['03', 'Confirm the details', 'Once availability and inclusions are verified, finalise the arrangements for your arrival, celebrations and farewell.'],
             ].map(([number, title, text]) => (
               <article key={number} className="border border-[#cfcec3] bg-[#f6f3ec] p-8 sm:p-10">
                 <span className="font-serif text-4xl text-[#c98736]">{number}</span>
@@ -638,13 +851,32 @@ Thank you!
         </div>
       </section>
 
-      <section id="offers" className="scroll-mt-8 bg-[#c98736] px-5 py-14 text-white sm:px-8">
-        <div className="mx-auto flex max-w-[1240px] flex-col justify-between gap-7 md:flex-row md:items-center">
-          <div>
-            <p className="text-[10px] font-bold tracking-[.25em] text-white/70 uppercase">Planning a group or event?</p>
-            <h2 className="mt-2 font-serif text-3xl sm:text-4xl">Let us create a stay that fits your occasion.</h2>
+      <section id="wedding-packages" className="scroll-mt-8 bg-[#c98736] px-5 py-20 text-white sm:px-8 lg:py-28">
+        <span id="offers" className="block scroll-mt-8" aria-hidden="true" />
+        <div className="mx-auto max-w-[1240px]">
+          <p className="text-[10px] font-bold tracking-[.25em] text-white/70 uppercase">Stay, wedding and event enquiries</p>
+          <h2 className="mt-2 max-w-3xl font-serif text-4xl sm:text-5xl">Custom destination wedding packages.</h2>
+          <p className="mt-5 max-w-2xl text-sm leading-7 text-white/75">Every quotation is enquiry-based and depends on your dates, room preference, event requirements and availability. Choose a starting point and tell the team what you need.</p>
+          <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {offers.map((offer) => (
+              <article key={offer.title} className="flex flex-col border border-white/25 bg-[#b9762e] p-6 sm:p-7">
+                <h3 className="font-serif text-2xl">{offer.title}</h3>
+                <p className="mt-4 text-sm leading-6 text-white/80">{offer.description}</p>
+                <p className="mt-5 border-t border-white/20 pt-4 text-xs leading-5 text-white/70">{offer.includes}</p>
+                <p className="mt-5 text-[10px] font-bold tracking-[.16em] text-white/65 uppercase">Personalised quotation</p>
+                <a
+                  href="#enquire"
+                  onClick={() => {
+                    setSelectedOccasion(offer.occasion)
+                    trackEvent('offer_enquiry_click', { occasion: offer.occasion })
+                  }}
+                  className="mt-6 inline-flex items-center gap-2 text-xs font-bold tracking-[.14em] uppercase"
+                >
+                  Enquire about this package <Icon name="arrow" className="h-4 w-4" />
+                </a>
+              </article>
+            ))}
           </div>
-          <a href="#enquire" className="inline-flex shrink-0 items-center justify-center gap-3 bg-[#17352a] px-7 py-4 text-xs font-bold tracking-[.14em] uppercase transition hover:bg-[#0e281f]">Request a custom quote <Icon name="arrow" /></a>
         </div>
       </section>
 
@@ -667,16 +899,16 @@ Thank you!
         <div className="mx-auto grid max-w-[1140px] gap-10 lg:grid-cols-[.72fr_1.28fr]">
           <div>
             <p className="eyebrow">Good to know</p>
-            <h2 className="font-serif text-4xl leading-tight sm:text-5xl">A few answers before you start planning.</h2>
+            <h2 className="font-serif text-4xl leading-tight sm:text-5xl">Wedding questions, answered.</h2>
             <p className="mt-5 max-w-sm text-sm leading-7 text-[#687971]">Need something more specific? Send an enquiry and our resort team will guide you personally.</p>
             <a href="#enquire" className="text-link mt-7">Ask the resort <Icon name="arrow" /></a>
           </div>
           <div className="divide-y divide-[#cfcec3] border-y border-[#cfcec3]">
             {[
-              ['Can you plan weddings and multi-day functions?', 'Yes. Share your dates, estimated guest count and function plan, and the team can suggest a suitable stay-and-event arrangement.'],
-              ['Do you host corporate offsites and meetings?', 'Yes. The resort can accommodate team gatherings, discussions, meals and leisure time within one destination.'],
-              ['Can I request a customised package?', 'Absolutely. Direct enquiries can be shaped around rooms, meals, event requirements and your preferred experience.'],
-              ['How do I get the best available price?', 'Use the enquiry form with your preferred dates, or call the reservation team for the most suitable direct offer available.'],
+              ['Can you plan a destination wedding in Jim Corbett?', 'Share your dates, estimated guest count and function plan. The team can then suggest a suitable wedding stay-and-event arrangement based on availability.'],
+              ['Can you help with Haldi, Mehendi, Sangeet and receptions?', 'These functions can be included in your brief. The team will confirm suitable spaces, layouts and arrangements for each celebration.'],
+              ['Is wedding accommodation available for guests?', 'The page includes Luxury Tent, Deluxe Room and Family Cottage options. Room availability, rooming plans and final inclusions are confirmed for your dates.'],
+              ['How do I request wedding package pricing?', 'Use the wedding enquiry form with your date, guest count, rooms required, budget range and WhatsApp number to request a personalised quotation.'],
             ].map(([question, answer]) => (
               <details key={question} className="faq group">
                 <summary>
@@ -693,11 +925,11 @@ Thank you!
       <section id="enquire" className="bg-[#0f2a21] px-5 py-20 text-white sm:px-8 lg:py-28">
         <div className="mx-auto grid max-w-[1240px] gap-12 lg:grid-cols-[.85fr_1.15fr]">
           <div>
-            <p className="eyebrow !text-[#f3bd65]">Start planning</p>
-            <h2 className="section-title !text-white">Your Corbett story<br /><em>starts here.</em></h2>
-            <p className="mt-6 max-w-md text-sm leading-7 text-white/62">Tell us what brings you to Corbett. Our resort team will connect with you to share availability, best-suited options and a personalised quote.</p>
+            <p className="eyebrow !text-[#f3bd65]">Wedding enquiry form</p>
+            <h2 className="section-title !text-white">Start planning your<br /><em>Jim Corbett wedding.</em></h2>
+            <p className="mt-6 max-w-md text-sm leading-7 text-white/62">Tell us about your wedding date, guest list and celebrations. The resort team will connect on WhatsApp to discuss availability, wedding accommodation and a personalised package.</p>
             <div className="mt-9 space-y-5 text-sm">
-              <a href="tel:+919999999999" className="flex items-center gap-4"><span className="grid h-11 w-11 place-items-center border border-white/20 text-[#f3bd65]"><Icon name="phone" /></span><span><small className="block text-[9px] tracking-[.18em] text-white/45 uppercase">Reservations</small>+91 99999 99999</span></a>
+              <a href="tel:+918595661099" onClick={() => trackEvent('phone_click', { location: 'enquiry' })} className="flex items-center gap-4"><span className="grid h-11 w-11 place-items-center border border-white/20 text-[#f3bd65]"><Icon name="phone" /></span><span><small className="block text-[9px] tracking-[.18em] text-white/45 uppercase">Reservations</small>+91 85956 61099</span></a>
               <a href="mailto:reservations@clickresort.com" className="flex items-center gap-4"><span className="grid h-11 w-11 place-items-center border border-white/20 text-[#f3bd65]"><Icon name="mail" /></span><span><small className="block text-[9px] tracking-[.18em] text-white/45 uppercase">Email us</small>reservations@clickresort.com</span></a>
             </div>
           </div>
@@ -713,13 +945,15 @@ Thank you!
               </div>
             ) : (
               <>
-                <label className="form-field"><span>Your name</span><input required placeholder="Enter full name" /></label>
-                <label className="form-field"><span>Phone number</span><input required type="tel" placeholder="+91 00000 00000" /></label>
-                <label className="form-field"><span>Email address</span><input type="email" placeholder="you@example.com" /></label>
-                <label className="form-field"><span>I am planning</span><select defaultValue=""><option value="" disabled>Select an occasion</option><option>Holiday stay</option><option>Destination wedding</option><option>Business meet / offsite</option><option>Party / social event</option></select></label>
-                <label className="form-field"><span>Preferred date</span><input type="date" /></label>
-                <label className="form-field"><span>Expected guests</span><input type="number" min="1" placeholder="Approx. guest count" /></label>
-                <label className="form-field sm:col-span-2"><span>Tell us a little more</span><textarea rows={3} placeholder="Rooms, event type, special requests..." /></label>
+                <label className="form-field"><span>Your name</span><input name="name" required placeholder="Enter full name" /></label>
+                <label className="form-field"><span>WhatsApp number</span><input name="phone" required type="tel" placeholder="+91 00000 00000" /></label>
+                <label className="form-field"><span>Email address</span><input name="email" type="email" placeholder="you@example.com" /></label>
+                <label className="form-field"><span>I am planning</span><select name="occasion" value={selectedOccasion} onChange={(event) => setSelectedOccasion(event.target.value)}><option value="" disabled>Select an occasion</option><option>Destination wedding</option><option>Wedding celebration</option><option>Holiday stay</option><option>Business meet / offsite</option><option>Party / social event</option><option>Luxury tent stay</option><option>Weekend getaway</option></select></label>
+                <label className="form-field"><span>Preferred date</span><input name="date" type="date" /></label>
+                <label className="form-field"><span>Expected guests</span><input name="guests" type="number" min="1" placeholder="Approx. guest count" /></label>
+                <label className="form-field"><span>Rooms required</span><input name="rooms" type="number" min="1" placeholder="Approx. rooms" /></label>
+                <label className="form-field"><span>Wedding budget range</span><select name="budget" defaultValue=""><option value="" disabled>Select a range</option><option>To be discussed</option><option>INR 5 lakh - INR 10 lakh</option><option>INR 10 lakh - INR 20 lakh</option><option>INR 20 lakh+</option></select></label>
+                <label className="form-field sm:col-span-2"><span>Tell us a little more</span><textarea name="message" rows={3} placeholder="Rooms, event type, special requests..." /></label>
                 <button className="sm:col-span-2 flex items-center justify-center gap-3 bg-[#c98736] px-7 py-4 text-xs font-bold tracking-[.15em] text-white uppercase transition hover:bg-[#a96c27]">Get a personalised quote <Icon name="arrow" /></button>
                 <p className="text-center text-[10px] leading-5 text-[#85918c] sm:col-span-2">By submitting, you agree to be contacted regarding your enquiry.</p>
               </>
@@ -736,7 +970,7 @@ Thank you!
             <p className="mt-5 max-w-sm text-xs leading-6 text-white/45">A nature-led retreat for restful stays, destination weddings, corporate gatherings and memorable celebrations in Jim Corbett.</p>
           </div>
           <div className="flex flex-wrap gap-x-7 gap-y-3 text-[10px] font-bold tracking-[.14em] text-white/65 uppercase">
-            <a href="#stay">Stay</a><a href="#rooms">Rooms</a><a href="#events">Events</a><a href="#about">About</a><a href="#enquire">Contact</a>
+            <a href="#wedding-gallery">Wedding gallery</a><a href="#wedding-packages">Wedding packages</a><a href="#rooms">Accommodation</a><a href="#events">Corporate events</a><a href="#enquire">Wedding enquiry</a>
           </div>
         </div>
         <div className="mx-auto flex max-w-[1240px] flex-col justify-between gap-2 pt-6 text-[10px] text-white/35 sm:flex-row">
@@ -746,7 +980,7 @@ Thank you!
       </footer>
 
       <div className="fixed inset-x-0 bottom-0 z-40 flex border-t border-[#d8d5ca] bg-white p-2 shadow-[0_-8px_28px_rgba(10,35,25,.12)] lg:hidden">
-        <a href="tel:+918595661099" className="grid w-14 place-items-center text-[#17352a]" aria-label="Call resort"><Icon name="phone" /></a>
+        <a href="tel:+918595661099" onClick={() => trackEvent('phone_click', { location: 'mobile_bar' })} className="grid w-14 place-items-center text-[#17352a]" aria-label="Call resort"><Icon name="phone" /></a>
         <a href="#enquire" className="flex flex-1 items-center justify-center gap-2 bg-[#c98736] px-5 py-3 text-xs font-bold tracking-[.12em] text-white uppercase">Get best price <Icon name="arrow" className="h-4 w-4" /></a>
       </div>
     </main>
