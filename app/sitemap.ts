@@ -10,6 +10,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "",
     "/hotels",
     "/hotels-in",
+    "/hotel-booking-partner",
+    "/hotel-partners",
     "/click-tiger-den",
     "/destinations/jaipur",
     "/destinations/goa",

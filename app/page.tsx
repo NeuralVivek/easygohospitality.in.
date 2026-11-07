@@ -52,7 +52,7 @@ export default function Home() {
                 <div key={item} className="border-t border-white/15 pt-3 text-sm text-white/80">{item}</div>
               ))}
             </div>
-            <Link href="#lead-form" className="mt-9 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-[#111111] transition hover:bg-white/85">
+            <Link href="/hotel-booking-partner" className="mt-9 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-[#111111] transition hover:bg-white/85">
               Become a travel partner <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
