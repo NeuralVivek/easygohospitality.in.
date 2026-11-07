@@ -12,7 +12,7 @@ export function SearchPanel() {
   const [query, setQuery] = useState("Jaipur");
   const [budget, setBudget] = useState("INR 10,000");
   const [guests, setGuests] = useState("2");
-  const [propertyType, setPropertyType] = useState("");
+  const [mealPlan, setMealPlan] = useState("");
   const [checkIn, setCheckIn] = useState("2026-11-12");
   const [checkOut, setCheckOut] = useState("2026-11-15");
   const isMounted = useSyncExternalStore(
@@ -32,9 +32,7 @@ export function SearchPanel() {
       return year && month && day ? `${day}-${month}-${year}` : value;
     };
     const guestLabel = guests === "5" ? "Family of 5" : `${guests} Guests`;
-    const propertyLabel = propertyType
-      ? propertyType.charAt(0).toUpperCase() + propertyType.slice(1)
-      : "All stays";
+    const mealPlanLabel = mealPlan || "Not specified";
     const message = [
       "Hello Team EasyGo Hospitality,",
       "",
@@ -43,7 +41,7 @@ export function SearchPanel() {
       `Check-in: ${formatDate(checkIn)}`,
       `Check-out: ${formatDate(checkOut)}`,
       `Guests: ${guestLabel}`,
-      `Property: ${propertyLabel}`,
+      `Meal plan: ${mealPlanLabel}`,
       `Budget: ${budget}`,
     ].join("\n");
 
@@ -52,7 +50,7 @@ export function SearchPanel() {
       guests,
       checkIn,
       checkOut,
-      property: propertyLabel,
+      mealPlan: mealPlanLabel,
       budget,
     });
     window.location.href = `https://wa.me/918595661099?text=${encodeURIComponent(message)}`;
@@ -95,12 +93,13 @@ export function SearchPanel() {
         </label>
 
         <label className="rounded-[1.4rem] border border-[#dddddd] bg-[#ffffff] px-4 py-3 text-left">
-          <span className="block text-[11px] uppercase tracking-[0.22em] text-[#555555]">Property</span>
-          <select value={propertyType} onChange={(event) => setPropertyType(event.target.value)} className="mt-2 w-full bg-transparent text-base font-medium text-[#111111] outline-none">
-            <option value="">All stays</option>
-            <option value="resort">Resort</option>
-            <option value="villa">Villa</option>
-            <option value="heritage">Heritage</option>
+          <span className="block text-[11px] uppercase tracking-[0.22em] text-[#555555]">Meal plan</span>
+          <select value={mealPlan} onChange={(event) => setMealPlan(event.target.value)} className="mt-2 w-full min-w-0 bg-transparent text-sm font-medium text-[#111111] outline-none">
+            <option value="">Select meal plan</option>
+            <option value="EP">EP</option>
+            <option value="CP">CP</option>
+            <option value="MAP">MAP</option>
+            <option value="AP">AP</option>
           </select>
         </label>
 
@@ -114,9 +113,9 @@ export function SearchPanel() {
           </select>
         </label>
 
-        <button type="submit" className="inline-flex items-center justify-center gap-2 rounded-[1.4rem] bg-[#111111] px-5 text-base font-medium text-[#f5f5f5] transition hover:bg-[#444444]">
+        <button type="submit" className="inline-flex whitespace-nowrap items-center justify-center gap-1.5 rounded-[1.4rem] bg-[#111111] px-3 text-xs font-medium text-[#f5f5f5] transition hover:bg-[#444444]">
           <Search className="h-4 w-4" />
-          Search
+          Check Best Price
         </button>
       </div>
 

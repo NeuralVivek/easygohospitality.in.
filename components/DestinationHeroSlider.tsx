@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { type TouchEvent, useEffect, useRef, useState } from "react";
 
@@ -40,6 +39,9 @@ export function DestinationHeroSlider() {
     touchStartX.current = null;
   };
 
+  const activeSlide = homepageDestinations[activeIndex];
+  const Heading = activeIndex === 0 ? "h1" : "h2";
+
   return (
     <section className="relative" aria-label="Featured destinations">
       <div
@@ -71,40 +73,53 @@ export function DestinationHeroSlider() {
         <div className="editorial-shell relative z-20 flex h-full items-center pb-28 pt-24 text-white">
           <div className="max-w-2xl">
             <p key={`eyebrow-${activeIndex}`} className="animate-[hero-copy-in_700ms_ease-out_both] text-xs font-semibold uppercase tracking-[0.3em] text-white">
-              {homepageDestinations[activeIndex].eyebrow} · {homepageDestinations[activeIndex].name}
+              {activeSlide.eyebrow} · {activeSlide.name}
             </p>
-            <h1 key={`title-${activeIndex}`} className="serif-display mt-5 max-w-3xl animate-[hero-copy-in_700ms_100ms_ease-out_both] text-5xl leading-[0.96] text-white sm:text-6xl lg:text-7xl">
-              {homepageDestinations[activeIndex].title}
-            </h1>
+            <Heading key={`title-${activeIndex}`} className="serif-display mt-5 max-w-3xl animate-[hero-copy-in_700ms_100ms_ease-out_both] text-5xl leading-[0.96] text-white sm:text-6xl lg:text-7xl">
+              {activeSlide.title}
+            </Heading>
             <p key={`subtitle-${activeIndex}`} className="mt-6 max-w-xl animate-[hero-copy-in_700ms_180ms_ease-out_both] text-base leading-7 text-white sm:text-lg">
-              {homepageDestinations[activeIndex].subtitle}
+              {activeSlide.subtitle}
             </p>
-            <Link href={`/hotels?destination=${encodeURIComponent(homepageDestinations[activeIndex].name)}`} className="group mt-8 inline-flex animate-[hero-copy-in_700ms_260ms_ease-out_both] items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-[#111111] shadow-[0_10px_30px_rgba(0,0,0,0.18)] transition duration-300 ease-out hover:-translate-y-1 hover:bg-[#f7f7f7] hover:shadow-[0_16px_34px_rgba(0,0,0,0.25)] active:translate-y-0 active:scale-[0.98]">
-              Explore hotels
-              <ArrowRight className="h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-1" />
-            </Link>
+            <div className="mt-8 flex flex-wrap gap-3 animate-[hero-copy-in_700ms_260ms_ease-out_both]">
+              <a
+                href={activeSlide.ctaHref ?? `/hotels?destination=${encodeURIComponent(activeSlide.name)}`}
+                target={activeSlide.ctaHref?.startsWith("https://") ? "_blank" : undefined}
+                rel={activeSlide.ctaHref?.startsWith("https://") ? "noreferrer" : undefined}
+                className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-[#111111] shadow-[0_10px_30px_rgba(0,0,0,0.18)] transition duration-300 ease-out hover:-translate-y-1 hover:bg-[#f7f7f7] hover:shadow-[0_16px_34px_rgba(0,0,0,0.25)] active:translate-y-0 active:scale-[0.98]"
+              >
+                {activeSlide.ctaLabel ?? "Explore hotels"}
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-1" />
+              </a>
+              {activeSlide.secondaryCtaLabel && activeSlide.secondaryCtaHref && (
+                <a
+                  href={activeSlide.secondaryCtaHref}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-black/15 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white hover:text-[#111111]"
+                >
+                  {activeSlide.secondaryCtaLabel}
+                </a>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="absolute bottom-8 left-1/2 z-30 flex w-[min(1280px,calc(100%-2rem))] -translate-x-1/2 items-end justify-between gap-6">
-          <div className="flex items-center gap-2">
-            {homepageDestinations.slice(0, 4).map((slide, index) => (
+        <div className="absolute inset-x-0 bottom-5 z-30 mx-auto flex w-[min(1280px,calc(100%-2rem))] items-center justify-between gap-4 sm:bottom-8">
+          <button type="button" onClick={() => goToSlide(activeIndex - 1)} aria-label="Previous destination" className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/45 bg-black/10 text-white backdrop-blur transition hover:bg-white hover:text-[#111111] sm:h-11 sm:w-11"><ChevronLeft className="h-5 w-5" /></button>
+          <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+            {homepageDestinations.map((slide, index) => (
               <button
                 key={slide.name}
                 type="button"
                 onClick={() => goToSlide(index)}
                 aria-label={`Show ${slide.name} slide`}
                 aria-current={activeIndex === index}
-                className={`whitespace-nowrap border-b-2 px-1 pb-2 text-xs font-semibold uppercase tracking-[0.16em] text-white transition ${activeIndex === index ? "border-[#111111]" : "border-transparent hover:text-white"}`}
-              >
-                {slide.name}
-              </button>
+                className={`h-1.5 rounded-full transition-all ${activeIndex === index ? "w-6 bg-white" : "w-1.5 bg-white/55 hover:bg-white/85"}`}
+              />
             ))}
           </div>
-          <div className="hidden items-center gap-2 sm:flex">
-            <button type="button" onClick={() => goToSlide(activeIndex - 1)} aria-label="Previous destination" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/35 bg-black/10 text-white backdrop-blur transition hover:bg-white hover:text-[#111111]"><ChevronLeft className="h-5 w-5" /></button>
-            <button type="button" onClick={() => goToSlide(activeIndex + 1)} aria-label="Next destination" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/35 bg-black/10 text-white backdrop-blur transition hover:bg-white hover:text-[#111111]"><ChevronRight className="h-5 w-5" /></button>
-            <button type="button" onClick={() => setIsPaused((paused) => !paused)} aria-label={isPaused ? "Resume destination autoplay" : "Pause destination autoplay"} className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/35 bg-black/10 text-white backdrop-blur transition hover:bg-white hover:text-[#111111]">
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={() => goToSlide(activeIndex + 1)} aria-label="Next destination" className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/45 bg-black/10 text-white backdrop-blur transition hover:bg-white hover:text-[#111111] sm:h-11 sm:w-11"><ChevronRight className="h-5 w-5" /></button>
+            <button type="button" onClick={() => setIsPaused((paused) => !paused)} aria-label={isPaused ? "Resume destination autoplay" : "Pause destination autoplay"} className="hidden h-11 w-11 items-center justify-center rounded-full border border-white/35 bg-black/10 text-white backdrop-blur transition hover:bg-white hover:text-[#111111] sm:inline-flex">
               {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
             </button>
           </div>

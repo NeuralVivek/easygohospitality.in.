@@ -18,11 +18,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://easygohospitality.in"),
   title: {
-    default: "easygohospitality.in | Premium India Hotel Discovery",
+    default: "EasyGo Hospitality | Hotels, Weddings & Group Stays",
     template: "%s | easygohospitality.in",
   },
   description:
-    "Discover premium stays in India, from heritage hotels to beach resorts, villas and luxury city escapes.",
+    "Discover hotels, resorts, destination wedding stays, corporate venues and group accommodation across India with EasyGo Hospitality.",
   verification: {
     google: "ss3f6EpkwFrmb2xUjPnwyWDAC0_gk7aZYucrv4fDzBk",
   },

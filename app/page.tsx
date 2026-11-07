@@ -27,12 +27,48 @@ export default function Home() {
       <DestinationHeroSlider />
 
       <ExperienceSlider />
+      <ExploreByExperience />
       <OfferSection />
       <HotDealsSection />
       <EventSection />
-      {/* <LastMinuteWeekendSection /> */}
       <HotelMoodCollection />
       <LastMinuteWeekendSection />
+
+      <section id="travel-partners" className="editorial-shell mt-20 overflow-hidden rounded-[2.5rem] bg-[#111111] text-white">
+        <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
+          <div className="p-8 md:p-12 lg:p-16">
+            <p className="text-xs uppercase tracking-[0.25em] text-white/60">For travel agents and tour operators</p>
+            <h2 className="mt-4 serif-display text-4xl leading-tight md:text-5xl">Your hospitality partner for every journey.</h2>
+            <p className="mt-5 max-w-xl text-base leading-7 text-white/70">
+              Discover hotel and resort options, destination-based assistance, group accommodation enquiries, and wedding or event stays through one helpful hospitality partner.
+            </p>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              {[
+                "Hotel and resort discovery",
+                "Group accommodation enquiries",
+                "Destination-based assistance",
+                "Wedding and event accommodation",
+              ].map((item) => (
+                <div key={item} className="border-t border-white/15 pt-3 text-sm text-white/80">{item}</div>
+              ))}
+            </div>
+            <Link href="#lead-form" className="mt-9 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-[#111111] transition hover:bg-white/85">
+              Become a travel partner <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="relative min-h-[300px] bg-[#222222]">
+            <Image
+              src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1400&q=85"
+              alt="Premium hotel lobby for EasyGo Hospitality travel partners"
+              fill
+              sizes="(max-width: 1024px) 100vw, 45vw"
+              className="object-cover opacity-80"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            <p className="absolute bottom-8 left-8 max-w-xs serif-display text-2xl">One point of contact. More ways to travel well.</p>
+          </div>
+        </div>
+      </section>
 
       <section id="popular-destinations" className="editorial-shell mt-16 scroll-mt-24">
         <div className="mb-6 flex items-end justify-between gap-3">
@@ -131,7 +167,7 @@ export default function Home() {
         <div className="rounded-[2.5rem] border border-[#dddddd] bg-[#ffffff] px-6 py-8 shadow-[0_25px_60px_rgba(0,0,0,0.04)] md:px-8">
           <p className="text-xs uppercase tracking-[0.2em] text-[#555555]">Travel content</p>
           <div className="mt-3 grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
-            <h2 className="serif-display text-4xl text-[#111111]">Best hotels in Jaipur, weekend escapes and family-friendly stays.</h2>
+            <h2 className="serif-display text-4xl text-[#111111]">Travel inspiration for your next stay.</h2>
             <p className="text-base leading-7 text-[#666666]">
               Explore thoughtful destination insights, local recommendations, and neighborhoods built around real travel intent.
             </p>
@@ -140,7 +176,7 @@ export default function Home() {
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             {[
               "Best hotels in Jaipur",
-              "Luxury stays near Jaipur Airport",
+              "Destination wedding stays in Jim Corbett",
               "Weekend stays for couples in Goa",
             ].map((title) => (
               <div key={title} className="rounded-[1.5rem] border border-[#dddddd] bg-[#f7f7f7] p-5">
@@ -167,7 +203,40 @@ export default function Home() {
             />
             <p className="mt-1">Premium hotel discovery for India.</p>
           </div>
-          <div className="flex flex-wrap gap-5">
+          <div className="grid gap-8 border-t border-[#d5d5d5] pt-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <p className="font-semibold text-[#111111]">Explore</p>
+              <div className="mt-3 flex flex-col gap-2">
+                <Link href="/hotels">Hotels and resorts</Link>
+                <Link href="/#popular-destinations">Popular destinations</Link>
+                <Link href="/#hot-deals">Signature stays</Link>
+              </div>
+            </div>
+            <div>
+              <p className="font-semibold text-[#111111]">Plan</p>
+              <div className="mt-3 flex flex-col gap-2">
+                <Link href="/#travel-partners">Travel partnerships</Link>
+                <Link href="/#lead-form">Request assistance</Link>
+                <Link href="/click-tiger-den">Wedding and events</Link>
+              </div>
+            </div>
+            <div>
+              <p className="font-semibold text-[#111111]">Destinations</p>
+              <div className="mt-3 flex flex-col gap-2">
+                <Link href="/hotels?destination=Jaipur">Jaipur</Link>
+                <Link href="/hotels?destination=Jim%20Corbett">Jim Corbett</Link>
+                <Link href="/hotels?destination=Varanasi">Varanasi</Link>
+              </div>
+            </div>
+            <div>
+              <p className="font-semibold text-[#111111]">Contact</p>
+              <div className="mt-3 flex flex-col gap-2">
+                <Link href="https://wa.me/918595661099" target="_blank" rel="noopener noreferrer">WhatsApp us</Link>
+                <Link href="/#lead-form">Enquiry form</Link>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-5 pt-5">
             <Link href="/hotels">Hotels</Link>
             <Link href="/hotels">Destinations</Link>
             <Link href="/hotels">Privacy</Link>

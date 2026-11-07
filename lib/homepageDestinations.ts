@@ -4,36 +4,50 @@ export type HomepageDestination = {
   title: string;
   subtitle: string;
   image: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  secondaryCtaLabel?: string;
+  secondaryCtaHref?: string;
 };
 
 export const homepageDestinations: HomepageDestination[] = [
   {
     name: "Ayodhya",
-    eyebrow: "Sacred India",
-    title: "Discover the Divine Beauty of Ayodhya",
-    subtitle: "Experience spirituality, heritage and luxurious stays.",
+    eyebrow: "Hospitality partnerships",
+    title: "Your Hotel Booking Partner in India",
+    subtitle: "Hotels, resorts and group stays for your clients — with personalised support.",
     image: "/Gemini_Generated_Image_e7r21ge7r21ge7r2.png",
+    ctaLabel: "Partner With EasyGo",
+    ctaHref: "https://wa.me/918595661099?text=Hello%20EasyGo%20Hospitality%21%0A%0AI%27m%20interested%20in%20partnering%20with%20EasyGo%20as%20a%20travel%20agent%20%2F%20tour%20operator.%0A%0APlease%20share%20your%20hotel%20booking%20assistance%2C%20partnership%20process%20and%20available%20options%20for%20my%20clients.%0A%0AThank%20you%21",
+    secondaryCtaLabel: "Explore Hotels",
+    secondaryCtaHref: "/hotels",
   },
   {
     name: "Varanasi",
-    eyebrow: "Timeless Varanasi",
-    title: "Experience the Eternal Magic of Varanasi",
-    subtitle: "Explore ancient traditions, sacred ghats and unforgettable stays.",
+    eyebrow: "Business travel and groups",
+    title: "Stay Solutions for Business & Groups",
+    subtitle: "Easy accommodation planning for corporate travel, events and group stays.",
     image: "https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&w=2200&q=88",
+    ctaLabel: "Enquire for Group Bookings",
+    ctaHref: "#lead-form",
   },
   {
     name: "Jaipur",
-    eyebrow: "Royal Rajasthan",
-    title: "Wander Through the Pink City",
-    subtitle: "Discover grand forts, colourful bazaars and heritage stays.",
+    eyebrow: "Weddings and events",
+    title: "Beautiful Stays for Weddings & Events",
+    subtitle: "Find the right resort, venue and accommodation for every celebration.",
     image: "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=2200&q=88",
+    ctaLabel: "Explore Wedding Venues",
+    ctaHref: "#events",
   },
   {
     name: "Pushkar",
-    eyebrow: "Sacred Serenity",
-    title: "Find Your Slow Escape in Pushkar",
-    subtitle: "Soak in desert sunsets, sacred lakes and soulful experiences.",
+    eyebrow: "For individual travellers",
+    title: "Make Your Next Stay Memorable",
+    subtitle: "Handpicked hotels and resorts for holidays, weekends and every journey.",
     image: "https://images.unsplash.com/photo-1590089415225-401ed6f9db8e?auto=format&fit=crop&w=2200&q=88",
+    ctaLabel: "Explore Destinations",
+    ctaHref: "#popular-destinations",
   },
   {
     name: "Kochi",
@@ -55,6 +69,13 @@ export const homepageDestinations: HomepageDestination[] = [
     title: "Rise Above the Ordinary in Gangtok",
     subtitle: "Explore mountain views, monasteries and peaceful hill stays.",
     image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=2200&q=88",
+  },
+  {
+    name: "Vrindavan",
+    eyebrow: "Sacred Serenity",
+    title: "Slow Down in Vrindavan",
+    subtitle: "Discover spiritual landmarks, peaceful mornings and welcoming stays.",
+    image: "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=2200&q=88",
   },
   {
     name: "Gurgaon",
