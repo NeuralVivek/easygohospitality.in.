@@ -29,6 +29,21 @@ export function LeadForm() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (step === "contact") {
+      const phone = form.phone.replace(/\D/g, "");
+      trackEvent("lead_form_submitted", { name: form.name.trim(), phone, source: "travel_expert_form" });
+      const message = `Hello EasyGo Hospitality!
+
+I'm ${form.name.trim()} and I would like help planning a stay.
+
+My phone number is ${form.phone.trim()}.
+
+Please have a travel expert share suitable hotel options and available offers.
+
+Thank you!`;
+      window.location.href = `https://wa.me/918595661099?text=${encodeURIComponent(message)}`;
+      return;
+    }
     trackEvent("booking_inquiry");
     setSubmitted(true);
   };
@@ -87,11 +102,8 @@ export function LeadForm() {
             />
           </div>
           <button
-            type="button"
-            onClick={() => {
-              trackEvent("lead_form_started");
-              setStep("details");
-            }}
+            type="submit"
+            onClick={() => trackEvent("lead_form_started")}
             className="inline-flex h-12 items-center gap-2 rounded-full bg-[#111111] px-5 text-sm font-medium text-[#ffffff] transition hover:bg-[#444444]"
           >
             Continue
@@ -170,4 +182,3 @@ export function LeadForm() {
     </motion.form>
   );
 }
-
