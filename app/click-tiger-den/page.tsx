@@ -746,7 +746,7 @@ Thank you!
       </footer>
 
       <div className="fixed inset-x-0 bottom-0 z-40 flex border-t border-[#d8d5ca] bg-white p-2 shadow-[0_-8px_28px_rgba(10,35,25,.12)] lg:hidden">
-        <a href="tel:+919999999999" className="grid w-14 place-items-center text-[#17352a]" aria-label="Call resort"><Icon name="phone" /></a>
+        <a href="tel:+918595661099" className="grid w-14 place-items-center text-[#17352a]" aria-label="Call resort"><Icon name="phone" /></a>
         <a href="#enquire" className="flex flex-1 items-center justify-center gap-2 bg-[#c98736] px-5 py-3 text-xs font-bold tracking-[.12em] text-white uppercase">Get best price <Icon name="arrow" className="h-4 w-4" /></a>
       </div>
     </main>
